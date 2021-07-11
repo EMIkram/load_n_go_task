@@ -21,6 +21,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Order Description"),
+      ),
       body: modal==null?Container(child: Center(child: Text("something went wrong!"),),):
       Padding(
         padding: const EdgeInsets.all(8.0),
@@ -30,7 +33,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             MyLabel(label:modal.orderNumber),
             SizedBox(height: 15,),
             Text("Order Details:",style: TextStyle(color: Colors.blue, fontSize: 16),),
-            SizedBox(height: 10,),
+            // SizedBox(height: 10,),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -38,12 +41,87 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 Text(modal.merchantName),
               ],
             ),
-            SizedBox(height: 10,),
+            // SizedBox(height: 10,),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(modal.orderDescription),
                 Text(modal.weightOfOrder+"(${modal.quantity})"),
+              ],
+            ),
+            SizedBox(height: 10,),
+            Text("Pick Up Details:",style: TextStyle(color: Colors.blue, fontSize: 16),),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Address"),
+                Text(modal.pickupAddressLine1),
+              ],
+            ),
+            // SizedBox(height: 10,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Postal Code"),
+                Text(modal.pickupPostalCode),
+              ],
+            ),
+            Text(modal.pickupDateDDMMYYY,style: TextStyle(fontSize: 12),),
+            SizedBox(height: 10,),
+            Text("Delivery Details:",style: TextStyle(color: Colors.blue, fontSize: 16),),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Address"),
+                Text(modal.deliveryAddressLine1),
+              ],
+            ),
+            // SizedBox(height: 10,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Postal Code"),
+                Text(modal.deliveryPostalCode),
+              ],
+            ),
+            Text(modal.deliveryDateDDMMYYYY,style: TextStyle(fontSize: 12),),
+            SizedBox(height: 10,),
+            Text("Customer Details:",style: TextStyle(color: Colors.blue, fontSize: 16),),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("First Name"),
+                Text(modal.customerFirstName),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Last Name"),
+                Text(modal.customerLastName),
+              ],
+            ),
+            // SizedBox(height: 10,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Email"),
+                Text(modal.customerEmail,style: TextStyle(decoration: TextDecoration.underline),),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Phone"),
+                Text(modal.customerPhoneNumber,style: TextStyle(decoration: TextDecoration.underline),),
+              ],
+            ),
+            SizedBox(height: 10,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Approval Status"),
+                MyLabel(label: modal.approvalStatus??"N/A",textColor: Colors.white,backGroundColor: modal.approvalStatus=="Yes"?Colors.green:Colors.red[400],)
               ],
             ),
           ],
