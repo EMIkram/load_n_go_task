@@ -5,6 +5,7 @@ import 'package:load_n_go_task/modals/dummyData.dart';
 import 'package:load_n_go_task/modals/orders_modal.dart';
 import 'package:load_n_go_task/widgets/my_button.dart';
 import 'package:load_n_go_task/widgets/my_label.dart';
+import 'package:load_n_go_task/widgets/my_text_field.dart';
 import 'order_detail_screen.dart';
 
 class AllOrdersScreen extends StatefulWidget {
@@ -16,7 +17,8 @@ class AllOrdersScreen extends StatefulWidget {
 
 class _AllOrdersScreenState extends State<AllOrdersScreen> {
   List<OrderModal> modalList =[];
-  List<OrderModal> duplicateModalList ;
+  List<OrderModal> duplicateModalList=[];
+  List<OrderModal> searchBackUp=[];
   List<String> sortLabels = ['PickUp Area Code','Delivery Area Code','Pickup Date','Delivery Date','Merchant Name'];
   List<String> pickUpAreaCodesList=[] ;
   List<String> deliveryAreaCodesList=[] ;
@@ -28,9 +30,8 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
   String merchantNameSelectedValue='Un Selected';
   String pickupDateSelectedValue='Un Selected';
   String deliveryDateSelectedValue='Un Selected';
-
-
   bool appBarBottomVisible=false;
+  TextEditingController _serachController = TextEditingController();
   @override
   void initState() {
    loadModal();
@@ -41,45 +42,77 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          Container(
-            width: 100,
-            child: Tooltip(
-              message: "Sort Orders",
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  isExpanded: true,
-                  icon: const Icon(Icons.sort,color: Colors.white,),
-                  iconSize: 24,
-                  // underline: Container(),
-                  onChanged: sortOrders,
-                  items: sortLabels
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
-          ),
-          Tooltip(
-            message: "Search",
-            child: IconButton(
-              icon: Icon(Icons.search,color: Colors.white,),
-              // onPressed: filterBottomSheet,
-            ),
-          ),
-          Tooltip(
-            message: "Filter",
-            child: IconButton(
-              icon: Icon(Icons.filter_alt_outlined),
-              onPressed: filterBottomSheet,
-            ),
-          ),
-
-
-          SizedBox(width: 10,),
+       modalList.any((element) => element.selected)?
+       Row(
+         children: [
+           IconButton(
+             icon: Icon(Icons.delete,color: Colors.red,),
+             onPressed: deleteOrders,
+           ),
+           Tooltip(message: "Mark as Approved",
+           child: IconButton(
+             icon: Icon(Icons.done,color: Colors.white,),
+             onPressed:markApproved ,
+           ),
+           )
+         ],
+       )
+       :Row(
+           children: [
+             Container(
+               width: 100,
+               child:
+               Tooltip(
+                 message: "Sort Orders",
+                 child: DropdownButtonHideUnderline(
+                   child: DropdownButton<String>(
+                     isExpanded: true,
+                     icon: const Icon(Icons.sort,color: Colors.white,),
+                     iconSize: 24,
+                     // underline: Container(),
+                     onChanged: sortOrders,
+                     items: sortLabels
+                         .map<DropdownMenuItem<String>>((String value) {
+                       return DropdownMenuItem<String>(
+                         value: value,
+                         child: Text(value),
+                       );
+                     }).toList(),
+                   ),
+                 ),
+               ),
+             ),
+             Tooltip(
+               message: "Search",
+               child: IconButton(
+                 icon: Icon(Icons.search,color: Colors.white,),
+                 onPressed: (){
+                   if(!appBarBottomVisible)
+                     {
+                       searchBackUp = modalList;
+                       setState(() {
+                         appBarBottomVisible=!appBarBottomVisible;
+                       });
+                     }
+                   else
+                     {
+                       setState(() {
+                         modalList= searchBackUp;
+                         appBarBottomVisible=!appBarBottomVisible;
+                       });
+                     }
+                 },
+               ),
+             ),
+             Tooltip(
+               message: "Filter",
+               child: IconButton(
+                 icon: Icon(Icons.filter_alt_outlined),
+                 onPressed: filterBottomSheet,
+               ),
+             ),
+           ],
+         ),
 
           SizedBox(width: 10,),
           // IconButton(icon: Icon(Icons.sort),),
@@ -88,10 +121,28 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
               bottom:PreferredSize(
                 child: Container(
                   height:appBarBottomVisible?70.0:0.0,
-                  child: Column(
-                    children: [
-
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                    child: Column(
+                      children: [
+                        TextField(
+                          focusNode: FocusNode(),
+                          style: TextStyle(
+                            color: Colors.white
+                          ),
+                          // hintText: "Type Order number,Merchant name or Pick/Delivery Date",
+                          decoration: InputDecoration(
+                            hintText: "Type Order number,Merchant name or Pick/Delivery Date",
+                            hintStyle: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12
+                            )
+                          ),
+                        onChanged:searchOrders,
+                        controller: _serachController,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                   preferredSize: Size.fromHeight(appBarBottomVisible?70.0:0.0),
@@ -103,9 +154,11 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
         padding: const EdgeInsets.all(8.0),
         child: WillPopScope(
           onWillPop: (){
-            modalList.forEach((element) {setState(() {
-              element.selected=false;
-            });});
+           setState(() {
+             modalList.forEach((element) {
+               element.selected=false;
+             });
+           });
             return;
           },
           child: ListView(
@@ -192,6 +245,15 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
                     Text(modal.deliveryDateDDMMYYYY),
                   ],
                 ),
+                SizedBox(height: 5,),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Approval Status"),
+                    MyLabel(label: modal.approvalStatus??"N/A",textColor: Colors.white,backGroundColor: modal.approvalStatus=="Yes"?Colors.green:Colors.red[400],)
+                  ],
+                ),
+                SizedBox(height: 10),
               ],
             ),
           ),
@@ -454,6 +516,29 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
       });
     }
     Navigator.pop(context);
+  }
+  searchOrders(String newValue){
+    setState(() {
+      modalList = searchBackUp.where((modal) => modal.merchantName.toLowerCase().contains(newValue.toLowerCase())||modal.orderNumber.toLowerCase().contains(newValue.toLowerCase())||modal.pickupDateDDMMYYY.toLowerCase().contains(newValue.toLowerCase())||modal.deliveryDateDDMMYYYY.toLowerCase().contains(newValue.toLowerCase())).toList();
+    });
+  }
+  markApproved(){
+  setState(() {
+    modalList.forEach((element) {
+      if(element.selected)
+      {
+        element.approvalStatus="Yes";
+        element.selected=false;
+      }
+    });
+  });
+  duplicateModalList = modalList;
+  }
+  deleteOrders(){
+   setState(() {
+  modalList.removeWhere((element) => element.selected);
+});
+   duplicateModalList = modalList;
   }
   loadModal(){
     setState(() {
