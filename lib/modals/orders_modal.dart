@@ -15,6 +15,7 @@ class OrderModal {
   String customerPhoneNumber;
   String merchantName;
   String approvalStatus;
+  bool selected=false;
 
   OrderModal(
       {this.orderNumber,
@@ -32,7 +33,7 @@ class OrderModal {
         this.customerEmail,
         this.customerPhoneNumber,
         this.merchantName,
-        this.approvalStatus
+        this.approvalStatus,
       });
 
   OrderModal.fromJson(Map<String, dynamic> json) {
