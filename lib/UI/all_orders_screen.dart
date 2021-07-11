@@ -83,9 +83,9 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
                ),
              ),
              Tooltip(
-               message: "Search",
+               message: appBarBottomVisible?"Search Cancel":"Search",
                child: IconButton(
-                 icon: Icon(Icons.search,color: Colors.white,),
+                 icon: Icon(appBarBottomVisible?Icons.search_off_rounded:Icons.search,color: Colors.white,),
                  onPressed: (){
                    if(!appBarBottomVisible)
                      {
