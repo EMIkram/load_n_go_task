@@ -5,14 +5,17 @@ class OrderModal {
   String quantity;
   String pickupDateDDMMYYY;
   String pickupAddressLine1;
+  String pickupAddressLine2="";
   String pickupPostalCode;
   String deliveryDateDDMMYYYY;
   String deliveryAddressLine1;
+  String deliveryAddressLine2="";
   String deliveryPostalCode;
   String customerFirstName;
   String customerLastName;
   String customerEmail;
   String customerPhoneNumber;
+  String customerCompany ="";
   String merchantName;
   String approvalStatus;
   bool selected=false;
