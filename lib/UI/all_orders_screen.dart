@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:load_n_go_task/Utils/utilities.dart';
 import 'package:load_n_go_task/modals/dummyData.dart';
 import 'package:load_n_go_task/modals/orders_modal.dart';
+import 'package:load_n_go_task/services/excel_services.dart';
 import 'package:load_n_go_task/widgets/my_button.dart';
 import 'package:load_n_go_task/widgets/my_label.dart';
 import 'package:load_n_go_task/widgets/my_text_field.dart';
@@ -54,7 +55,13 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
              icon: Icon(Icons.done,color: Colors.white,),
              onPressed:markApproved ,
            ),
-           )
+           ),
+           Tooltip(message: "Save Selected Items",
+             child: IconButton(
+               icon: Icon(Icons.save_alt,color: Colors.white,),
+               onPressed: saveSelectedItems,
+             ),
+           ),
          ],
        )
        :Row(
@@ -540,6 +547,16 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
 });
    duplicateModalList = modalList;
   }
+
+  saveSelectedItems(){
+    ExcelService service = ExcelService(sheetName: "LnG Test Data");
+    modalList.forEach((modal) {
+      if(modal.selected)
+        service.appendRow(modal);
+    });
+    service.saveToDownloads();
+  }
+
   loadModal(){
     setState(() {
       modalList=DummyData.ordersList.map((orderjson) => OrderModal.fromJson(orderjson)).toList();

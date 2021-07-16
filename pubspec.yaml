@@ -23,6 +23,9 @@ dependencies:
   cached_map: ^2.0.5
   excel: ^1.1.5
   downloads_path_provider: ^0.1.0
+  permission_handler: ^8.1.2
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

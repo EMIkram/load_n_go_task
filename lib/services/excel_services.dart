@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:downloads_path_provider/downloads_path_provider.dart';
 import 'package:excel/excel.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:load_n_go_task/Utils/utilities.dart';
 import 'package:load_n_go_task/modals/orders_modal.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ExcelService{
   var excel = Excel.createExcel(); // automatically creates 1 empty sheet: Sheet1
@@ -84,15 +86,28 @@ class ExcelService{
          ]);
   }
 
-  saveToDownloads(){
-    Future<Directory> downloadsDirectory = DownloadsPathProvider.downloadsDirectory;
-    // Save the Changes in file
-
-    excel.encode().then((onValue) {
-      File.fromUri(Uri.parse("$downloadsDirectory/$sheetName.xlsx"))
-      ..createSync(recursive: true)
-      ..writeAsBytesSync(onValue);
-    });
+  saveToDownloads() async {
+    await Permission.storage.request();
+    // var status = await Permission.storage.status;
+    // if (!status.isGranted) {
+    //   await Permission.storage.request();
+    // }
+ try{
+   Directory downloadsDirectory = await  DownloadsPathProvider.downloadsDirectory;
+   // Save the Changes in file
+   excel.encode().then((onValue) {
+     File file = File("${downloadsDirectory.path}/$sheetName.xlsx")
+     // File.fromUri(Uri.parse("$downloadsDirectory/$sheetName.xlsx"))
+     //   ..createSync(recursive: true)
+     ..create(recursive: true)
+       ..writeAsBytesSync(onValue);
+     Utils.showToast("File saved in $downloadsDirectory");
+   });
+ }
+ catch(e)
+    {
+      Utils.showToast("${e.message}");
+    }
   }
 
 }
